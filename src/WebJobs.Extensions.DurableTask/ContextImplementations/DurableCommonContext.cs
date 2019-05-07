@@ -75,8 +75,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.DurableTask
 
         internal string RawInput { get; set; }
 
-        internal bool IsCompleted { get; set; }
-
         internal OrchestrationContext InnerContext { get; set; }
 
         internal ExceptionDispatchInfo OrchestrationException { get; set; }

@@ -53,7 +53,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.DurableTask
             return this.context.GetSerializedCustomStatus();
         }
 
-        public override void TraceAwait()
+        public void TraceAwait()
         {
             this.Config.TraceHelper.FunctionAwaited(
                 this.context.HubName,
