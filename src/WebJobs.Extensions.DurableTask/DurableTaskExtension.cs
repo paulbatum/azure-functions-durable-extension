@@ -317,7 +317,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.DurableTask
 
             if (!context.IsCompleted)
             {
-                shim.TraceAwait();
+                this.TraceHelper.FunctionAwaited(
+                    context.HubName,
+                    context.Name,
+                    context.FunctionType,
+                    context.InstanceId,
+                    context.IsReplaying);
             }
 
             if (context.IsCompleted &&
@@ -443,6 +448,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.DurableTask
                             // 4. Run the DTFx orchestration to persist the effects,
                             // send the outbox, and continue as new
                             await next();
+
                         }
                         catch (Exception e)
                         {
@@ -463,8 +469,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.DurableTask
                             var entitySchedulerExceptions = new OrchestrationFailureException(
                                 $"Entity scheduler {entityShim.EntityId} failed: {e.Message}",
                                 Utils.SerializeCause(e, MessagePayloadDataConverter.ErrorConverter));
-
-                            entityContext.OrchestrationException = ExceptionDispatchInfo.Capture(entitySchedulerExceptions);
 
                             throw entitySchedulerExceptions;
                         }

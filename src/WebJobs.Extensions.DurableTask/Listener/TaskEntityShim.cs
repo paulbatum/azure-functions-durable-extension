@@ -121,7 +121,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.DurableTask
                 this.context.State = JsonConvert.DeserializeObject<SchedulerState>(serializedInput, MessagePayloadDataConverter.MessageSettings);
             }
 
-            if (!this.context.State.EntityExists)
+            if (serializedInput == null)
             {
                 this.context.AddDeferredTask(() => this.Config.LifeCycleNotificationHelper.OrchestratorStartingAsync(
                     this.context.HubName,
@@ -251,15 +251,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.DurableTask
                 // exception must be sent with response back to caller
                 this.context.CurrentOperationResponse.SetExceptionResult(e, this.context.CurrentOperation.Operation, this.EntityId);
 
-                // the first exception is also handed over to the functions runtime
-                if (this.context.OrchestrationException == null)
-                {
-                    var operationException = new OrchestrationFailureException(
-                        $"Operation '{request.Operation}' on entity {this.EntityId} failed: {e.Message}",
-                        Utils.SerializeCause(e, MessagePayloadDataConverter.ErrorConverter));
-                    this.context.OrchestrationException = ExceptionDispatchInfo.Capture(operationException);
-                }
-
                 this.Config.TraceHelper.FunctionFailed(
                     this.context.HubName,
                     this.context.Name,
@@ -278,7 +269,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.DurableTask
             this.context.CurrentOperationResponse = null;
 
             // send response
-            // TODO think about how to handle exceptions in signals
             if (!request.IsSignal)
             {
                 var target = new OrchestrationInstance() { InstanceId = request.ParentInstanceId };

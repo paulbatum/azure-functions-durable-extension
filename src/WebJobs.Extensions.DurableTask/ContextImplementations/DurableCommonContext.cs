@@ -77,8 +77,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.DurableTask
 
         internal OrchestrationContext InnerContext { get; set; }
 
-        internal ExceptionDispatchInfo OrchestrationException { get; set; }
-
         internal string HubName => this.Config.Options.HubName;
 
         internal string Name => this.FunctionName;
